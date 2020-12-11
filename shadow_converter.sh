@@ -8,13 +8,15 @@ fi
 tag=${1}
 orig_tag=${2}
 app_config=${3}
-chart_name=`cat helm/*/Chart.yaml | sed -nE "s/name: *(.+)/\1/p"`
 
-sed -i '' -E "s/^version: .+$/version: $tag/" helm/public-concordances-api/Chart.yaml
-sed -E "s/({{ *.Values.service.name *}})/\1-shadow/" helm/public-concordances-api/templates/deployment.yaml > helm/public-concordances-api/templates/deployment-shadow.yaml
-sed -E "s/({{ *.Values.service.name *}})/\1-shadow/" helm/public-concordances-api/templates/service.yaml > helm/public-concordances-api/templates/service-shadow.yaml
-sed -i '' -E "s/({{ *.Values.service.name *}})/\1-orig/" helm/public-concordances-api/templates/service.yaml
-sed -i '' -E "s/(image: +.+):{{ *.Chart.Version *}}/\1:$orig_tag/" helm/public-concordances-api/templates/deployment.yaml
-sed -i '' -E "s/({{ *.Values.service.name *}})/\1-orig/" helm/public-concordances-api/templates/deployment.yaml
+cd helm/*
 
-helm upgrade $chart_name "./helm/$chart_name" --install --values="$app_config"
+sed -i '' -E "s/^version: .+$/version: $tag/" Chart.yaml
+sed -E "s/({{ *.Values.service.name *}})/\1-shadow/" templates/deployment.yaml > templates/deployment-shadow.yaml
+sed -E "s/({{ *.Values.service.name *}})/\1-shadow/" templates/service.yaml > templates/service-shadow.yaml
+sed -i '' -E "s/({{ *.Values.service.name *}})/\1-orig/" templates/service.yaml
+sed -i '' -E "s/(image: +.+):{{ *.Chart.Version *}}/\1:$orig_tag/" templates/deployment.yaml
+sed -i '' -E "s/({{ *.Values.service.name *}})/\1-orig/" templates/deployment.yaml
+
+chart_name=`cat Chart.yaml | sed -nE "s/name: *(.+)/\1/p"`
+helm upgrade $chart_name . --install --values="app-configs/$app_config"
