@@ -26,9 +26,9 @@ spec:
         args:
         - start
         - "--primary"
-        - "http://{{ .Values.service.name }}-orig:{{ .Values.env.app.port }}"
+        - "http://{{ .Values.service.name }}-%primary%:{{ .Values.env.app.port }}"
         - "--candidate"
-        - "http://{{ .Values.service.name }}-shadow:{{ .Values.env.app.port }}"
+        - "http://{{ .Values.service.name }}-%candidate%:{{ .Values.env.app.port }}"
         - "--mirroring"
         ports:
         - containerPort: 8080
