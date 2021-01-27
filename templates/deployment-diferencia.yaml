@@ -1,4 +1,9 @@
 {{- $diferenciaDeployName := printf "diferencia-%s" .Chart.Name | trunc 63 | trimSuffix "-" -}}
+# workaround for Helm error "nil pointer evaluating interface"
+{{- $envValues := default dict .Values.env -}}
+{{- $appEnvValues := default dict $envValues.app -}}
+{{- $appPort := default "8080" $appEnvValues.port -}}
+# end of workaround for Helm error "nil pointer evaluating interface"
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -26,9 +31,9 @@ spec:
         args:
         - start
         - "--primary"
-        - "http://{{ .Values.service.name }}-%primary%:{{ .Values.env.app.port }}"
+        - "http://{{ .Values.service.name }}-%primary%:{{ $appPort }}"
         - "--candidate"
-        - "http://{{ .Values.service.name }}-%candidate%:{{ .Values.env.app.port }}"
+        - "http://{{ .Values.service.name }}-%candidate%:{{ $appPort }}"
         - "--mirroring"
         ports:
         - containerPort: 8080
